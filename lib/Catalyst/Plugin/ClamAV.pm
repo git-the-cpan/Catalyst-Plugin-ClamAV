@@ -2,7 +2,8 @@ package Catalyst::Plugin::ClamAV;
 
 use strict;
 use warnings;
-use ClamAV::Client;
+use IO::Handle;
+use Net::ClamAV::Client;
 
 our $VERSION = '0.03';
 our $base    = 'clamav';
@@ -23,7 +24,8 @@ sub clamscan {
 
         my $fh = $upload->fh;
         if ($fh) {
-            my $virus = $scanner->scan_stream( $fh );
+            my $io = IO::Handle->new_from_fd($fh, 'r');
+            my $virus = $scanner->scanStreamFH( $io );
             seek( $fh, 0, 0 );
             if ( $virus ) {
                 $found++;
@@ -45,9 +47,19 @@ sub _init_clam {
     foreach my $n(qw( socket_name socket_host socket_port )){
         $opt{$n} = $c->config->{$base}->{$n} if defined $c->config->{$base}->{$n};
     }
+    my %new_opt;
+    if ( $opt{socket_name} ) {
+        $new_opt{url} = $opt{socket_name};
+    }
+    else {
+        my $host = $opt{socket_host} || 'localhost';
+        my $port = $opt{socket_port} || 3310;
+        $new_opt{url} = "$host:$port";
+    }
+
     my ( $scanner, $error );
     eval {
-        $scanner = ClamAV::Client->new( %opt );
+        $scanner = Net::ClamAV::Client->new( %new_opt );
         if ( !$scanner or !$scanner->ping ) {
             $error = 1;
         }
@@ -92,7 +104,7 @@ Catalyst::Plugin::ClamAV - ClamAV scanning Plugin for Catalyst
 
 This plugin add virus scan method (using ClamAV) for Catalyst.
 
-Using ClamAV::Client module.
+Using Net::ClamAV::Client module.
 
 =head1 CONFIGURATION
 
@@ -100,7 +112,7 @@ Using ClamAV::Client module.
   MyApp->config->{clamav}->{socket_host};    # TCP/IP host
   MyApp->config->{clamav}->{socket_port};    # TCP/IP port
 
-See ClamAV::Client POD.
+See Net::ClamAV::Client POD.
 
 =head1 METHODS
 
@@ -108,7 +120,7 @@ See ClamAV::Client POD.
 
 =item clamscan
 
-Scan uploaded file handles, using ClamAV::Client->scan_stream().
+Scan uploaded file handles, using Net::ClamAV::Client->scanStreamFH().
 Takes file upload field names as arguments.
 
 HTML:
@@ -135,7 +147,7 @@ To get found virus detail,
 
 =head1 SEE ALSO
 
-L<Catalyst> L<ClamAV::Client>
+L<Catalyst> L<Net::ClamAV::Client>
 
 =head1 AUTHOR
 
