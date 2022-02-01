@@ -22,19 +22,19 @@ sub clamscan {
         next unless @uploads;
 
         foreach my $upload (@uploads) {
-        my $fh = $upload->fh;
-        if ($fh) {
-            my $virus = $scanner->scan_stream( $fh );
-            seek( $fh, 0, 0 );
-            if ( $virus ) {
-                $found++;
-                push @virus, {
-                    name      => $name,
-                    signature => $virus,
-                };
-                $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
+            my $fh = $upload->fh;
+            if ($fh) {
+                my $virus = $scanner->scan_stream( $fh );
+                seek( $fh, 0, 0 );
+                if ( $virus ) {
+                    $found++;
+                    push @virus, {
+                        name      => $name,
+                        signature => $virus,
+                    };
+                    $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
+                }
             }
-        }
         }
     }
     return wantarray ? @virus : $found;
