@@ -19,9 +19,10 @@ sub clamscan {
     my $found = 0;
     my @virus;
     foreach my $name (@names) {
-        my $upload = $c->req->upload( $name );
-        next unless $upload;
+        my @uploads = $c->req->upload( $name );
+        next unless @uploads;
 
+        foreach my $upload (@uploads) {
         my $fh = $upload->fh;
         if ($fh) {
             my $io = IO::Handle->new_from_fd($fh, 'r');
@@ -35,6 +36,7 @@ sub clamscan {
                 };
                 $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
             }
+        }
         }
     }
     return wantarray ? @virus : $found;
