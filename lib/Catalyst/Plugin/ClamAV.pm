@@ -23,20 +23,20 @@ sub clamscan {
         next unless @uploads;
 
         foreach my $upload (@uploads) {
-        my $fh = $upload->fh;
-        if ($fh) {
-            my $io = IO::Handle->new_from_fd($fh, 'r');
-            my $virus = $scanner->scanStreamFH( $io );
-            seek( $fh, 0, 0 );
-            if ( $virus ) {
-                $found++;
-                push @virus, {
-                    name      => $name,
-                    signature => $virus,
-                };
-                $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
+            my $fh = $upload->fh;
+            if ($fh) {
+                my $io = IO::Handle->new_from_fd($fh, 'r');
+                my $virus = $scanner->scanStreamFH( $io );
+                seek( $fh, 0, 0 );
+                if ( $virus ) {
+                    $found++;
+                    push @virus, {
+                        name      => $name,
+                        signature => $virus,
+                    };
+                    $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
+                }
             }
-        }
         }
     }
     return wantarray ? @virus : $found;
