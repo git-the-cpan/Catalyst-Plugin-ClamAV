@@ -32,6 +32,7 @@ sub clamscan {
                     $found++;
                     push @virus, {
                         name      => $name,
+                        filename  => $upload->filename,
                         signature => $virus,
                     };
                     $c->log->warn( __PACKAGE__ . " VIRUS found. signature='$virus'" );
@@ -100,7 +101,11 @@ Catalyst::Plugin::ClamAV - ClamAV scanning Plugin for Catalyst
     my $found = $c->clamscan('field1', 'field2');
 
     my @found_virus = $c->clamscan('field1', 'field2');
-    # e.g. @found_virus == ( { name => 'field1', signature => 'VIRUSNAME' } );
+    # e.g. @found_virus == ( {
+    #          name      => 'field1',
+    #          filename  => 'filename',
+    #          signature => 'VIRUSNAME'
+    #      } );
 
 =head1 DESCRIPTION
 
