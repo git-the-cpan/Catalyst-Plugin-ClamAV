@@ -9,7 +9,7 @@ use Catalyst::Test 'TestApp';
 use HTTP::Request::Common;
 use Data::Dumper;
 
-plan tests => 6;
+plan tests => 9;
 
 my $no_scan;
 if ( !$ENV{CLAMAV_SOCKET_NAME}
@@ -53,6 +53,33 @@ if ( !$ENV{CLAMAV_SOCKET_NAME}
                 Content => 'x' x 1024,
             ],
             'file2' => [
+                undef,
+                'bar.txt',
+                'Content-Type' => 'text/plain',
+                Content => 'y' x 1024,
+            ],
+        ]
+    );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Upload ok' );
+
+    my $content = $response->content;
+    ok( $content eq ( $no_scan ? '-1' : '0'), 'Scan ok' )
+}
+
+{
+    my $request = POST(
+        "http://localhost/upload",
+        'Content-Type' => 'multipart/form-data',
+        'Content'      => [
+            'file1' => [
+                undef,
+                'foo.txt',
+                'Content-Type' => 'text/plain',
+                Content => 'x' x 1024,
+            ],
+            'file1' => [
                 undef,
                 'bar.txt',
                 'Content-Type' => 'text/plain',

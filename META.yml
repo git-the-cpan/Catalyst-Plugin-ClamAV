@@ -7,7 +7,7 @@ generated_by:        ExtUtils::MakeMaker version 6.32
 distribution_type:   module
 requires:     
     Catalyst:                      0
-    ClamAV::Client:                0.1
+    Net:ClamAV::Client:            0
     Test::More:                    0
 meta-spec:
     url:     http://module-build.sourceforge.net/META-spec-v1.2.html

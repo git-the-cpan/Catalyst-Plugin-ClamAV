@@ -12,7 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Catalyst'       => 0,
         'Test::More'     => 0,
-        'ClamAV::Client' => 0.10,
+        'Net::ClamAV::Client' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Catalyst-Plugin-ClamAV-*' },
